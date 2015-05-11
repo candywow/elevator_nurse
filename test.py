@@ -98,6 +98,6 @@ def paint():
 	py.plot(data)
 
 if __name__ == '__main__':
-	get_z_new('acc_data2.txt')
-	#paint()
+	#get_z_new('acc_data2.txt')
+	paint()
 	#get_start_num()
