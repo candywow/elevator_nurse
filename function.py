@@ -1,5 +1,6 @@
 import plotly.plotly as py
 import datetime
+import time
 from plotly.graph_objs import *
 
 def get_z(file_name):
@@ -10,23 +11,27 @@ def get_z(file_name):
 		with open(file_name) as f:
 			for line in f.readlines()[4500:4510]:
 				f1.write(line)
-				try:
-					data = line.split('"z":')
-					data = data[1].split('}')
-					time_tmp = data[1].split('"timestamp":')
+				#try:
+				data = line.split('"z":')
+				data = data[1].split('}')
+				time_tmp = data[1].split('"timestamp":')
 
-					tmp = int(time_tmp[1])/1000
-					time_tmp = datetime.datetime.\
-						fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S')
+				tmp = int(time_tmp[1])/1000.0
+				'''print tmp
+				time_tmp = datetime.datetime.\
+						fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S.%f')
+					
+				print time_tmp'''
 
-					x = line.split('"x":')
-					x = x[1].split(',')
+				x = line.split('"x":')
+				x = x[1].split(',')
 
-					z.append(float(x[0]))
-					time.append(time_tmp)
-				except:
-					pass
+				z.append(float(x[0]))
+				time.append(tmp)
+				#except:
+				#	pass
 		data = {'time':time, 'z':z}
+		#print data
 		f1.close()
 		return data
 	except IOError as err:
@@ -42,7 +47,6 @@ def get_z_new(file_name):
 				z_per = data[2].split(' ')[1].split(']')[0]
 				time_tmp = data[3].split('\n')[0]
 				print time_tmp
-				tmp = int(time_tmp)
 				time_per = datetime.datetime.\
 					fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -79,12 +83,7 @@ def get_start_num():
 
 
 
-def paint():
-	data = get_z('data3')
-	#x = []
-	#for i in range(0,len(z)):
-	#	x.append(i+1)
-
+def paint(data):
 	data = {'x': data['time'], 'y': data['z']}
 
 	trace1 = Scatter(
@@ -98,6 +97,6 @@ def paint():
 	py.plot(data)
 
 if __name__ == '__main__':
-	#get_z_new('acc_data2.txt')
-	paint()
+	get_z('data3')
+	#paint()
 	#get_start_num()
