@@ -180,6 +180,31 @@ def pip_identification(array_point):
 	#print max_vd_list
 	return tmp_list
 
+def tree_pruning(max_vd_list):
+	change_vd = []
+	for i in range(2, len(max_vd_list)-1):
+		tmp = abs(max_vd_list[i] - max_vd_list[i+1])
+		tmp = {'change_vd': tmp, 'index': i}
+		change_vd.append(tmp)
+	#paint_change_vd(change_vd)
+
+	max = {'change_vd': 0, 'index': -1}
+	for item in change_vd:
+		if item['change_vd'] >= max['change_vd']:
+			max = item
+	#print max['index'] 
+
+	return max['index'] + 1
+
+def paint_change_vd(change_vd):
+	time = range(2, len(change_vd)+2)
+	tmp_vd = []
+	for item in change_vd:
+		tmp_vd.append(item['change_vd'])
+	data = {'time':time, 'z':tmp_vd}
+	function.paint(data)
+
+
 def paint(array_point):
 	time = []
 	z = []
@@ -197,20 +222,30 @@ def paint(array_point):
 	data = {'time':time, 'z':z}
 	function.paint(data)
 
+def paint_vd(max_vd_list):
+	time = range(2, len(max_vd_list))
+	z = max_vd_list[2:len(max_vd_list)]
+	data = {'time':time, 'z':z}
+	function.paint(data)
+
 def main():
 	z = function.get_z('data3')
 	data = restruct(z)
 	print data
-	#paint(data)
+	paint(data)
 	tmp_list = pip_identification(data)
 	pip_list = tmp_list['pip_list']
 	max_vd_list = tmp_list['max_vd_list']
+	#paint_vd(max_vd_list)
+	length = tree_pruning(max_vd_list)
+	print length
+	#paint_change_vd(change_vd)
 	#print pip_list
 	#print max_vd_list
 
 	sb_tree = SBTree()
 	sb_tree.create(pip_list, data, max_vd_list)
-	result = sb_tree.access(10)
+	result = sb_tree.access(length)
 	tmp = []
 
 	for item in result:
