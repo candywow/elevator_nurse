@@ -9,7 +9,7 @@ def get_z(file_name):
 		time = []
 		f1 = open('test.txt', 'w')
 		with open(file_name) as f:
-			for line in f.readlines()[4500:4510]:
+			for line in f.readlines()[4500:4520]:
 				f1.write(line)
 				#try:
 				data = line.split('"z":')

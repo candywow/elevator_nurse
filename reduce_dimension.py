@@ -2,6 +2,7 @@ import function
 import time
 import datetime
 import math
+from operator import attrgetter
 
 class Point(object):
 	def __init__(self, x=0, y=0):
@@ -12,23 +13,108 @@ class Point(object):
 		return "x:%f, y:%f" % (self.x, self.y)
 
 class TreeNode(object):
-	def __init__(self, x=0, y=0, left=0, right=0, dist=0):
-		self.x = x
-		self.y = y
+	def __init__(self, point=None, left=None, right=None, dist=None, index=-1):
+		self.point = point
 		self.left = left
 		self.right = right
 		self.dist = dist
+		self.index = index
 
 class SBTree(object):
 	def __init__(self, root=0):
 		self.root = root
 
+	def is_empty(self):
+		if self.root is 0:
+			return True
+		else:
+			return False
+
+	def create(self, pip_list, array_point, max_vd_list):
+		#let last data point become the root of SBTree
+		last_point = array_point[pip_list[0]]
+		cnode = TreeNode(last_point, None, None, max_vd_list[0], pip_list[0])
+		self.root = cnode
+		pnode = self.root
+
+		#let first data point become the right child of root
+		first_point = array_point[pip_list[1]]
+		cnode = TreeNode(first_point, None, None, max_vd_list[1], pip_list[1])
+		pnode.left = cnode
+		pnode = cnode
+
+		for i in range(2,len(pip_list)):
+			tmp_point = array_point[pip_list[i]]
+			cnode = TreeNode(tmp_point, None, None, max_vd_list[i], pip_list[i])
+			pnode = self.root.left
+			while True:
+				if cnode.point.x < pnode.point.x:
+					if pnode.left == None:
+						pnode.left = cnode
+						break
+					else:
+						pnode = pnode.left
+				else:
+					if pnode.right == None:
+						pnode.right = cnode
+						break
+					else:
+						pnode = pnode.right
+
+	def middle_order(self, tree_node):
+		if tree_node.left != None:
+			self.middle_order(tree_node.left)
+		print tree_node.index
+		if tree_node.right != None:
+			self.middle_order(tree_node.right)
+
+	def display(self):
+		self.middle_order(self.root)
+
+	def find_max(self, tmp):
+		max = TreeNode()
+		max.dist = 0
+
+		for node in tmp['heap']:
+			if node.dist >= max.dist:
+				max = node
+		#print 'max:'
+		#print max.index
+
+		tmp['result'].append(max)
+		tmp['heap'].remove(max)
+
+		if max.left != None:
+			tmp['heap'].append(max.left)
+		if max.right != None:
+			tmp['heap'].append(max.right)
+
+	def access(self, length):
+		result = []
+		heap = []
+		tmp = {'result': result, 'heap': heap}
+		tmp['result'].append(self.root)
+		tmp['result'].append(self.root.left)
+		node = self.root.left
+
+		if node.left != None:
+			tmp['heap'].append(node.left)
+		if node.right != None:
+			tmp['heap'].append(node.right)
+
+		for i in range(length):
+			self.find_max(tmp)
+
+		#print 'result:'
+		#for i in tmp['result']:
+		#	print i.index
+		return result
 
 def restruct(data):
 	data_new = []
 	for i in range(len(data['z'])):
 		tmp_point = Point(data['time'][i], data['z'][i])
-		print tmp_point
+		#print tmp_point
 		data_new.append(tmp_point)
 
 	return data_new
@@ -89,14 +175,20 @@ def pip_identification(array_point):
 		#print 'pip_list: '
 		#print pip_list
 
-	print pip_list
-	print max_vd_list
+	tmp_list = {'pip_list': pip_list, 'max_vd_list': max_vd_list}
+	#print pip_list
+	#print max_vd_list
+	return tmp_list
 
 def paint(array_point):
 	time = []
 	z = []
 
-	for item in array_point:
+	#print array_point
+	sorted_point = sorted(array_point, key=attrgetter('x'))
+	print sorted_point
+
+	for item in sorted_point:
 		time_tmp = datetime.datetime.\
 						fromtimestamp(item.x).strftime('%Y-%m-%d %H:%M:%S:%f')
 		time.append(time_tmp)
@@ -108,8 +200,24 @@ def paint(array_point):
 def main():
 	z = function.get_z('data3')
 	data = restruct(z)
+	print data
 	#paint(data)
-	pip_identification(data)
+	tmp_list = pip_identification(data)
+	pip_list = tmp_list['pip_list']
+	max_vd_list = tmp_list['max_vd_list']
+	#print pip_list
+	#print max_vd_list
+
+	sb_tree = SBTree()
+	sb_tree.create(pip_list, data, max_vd_list)
+	result = sb_tree.access(10)
+	tmp = []
+
+	for item in result:
+		tmp.append(item.point)
+	paint(tmp)
+	#print 'middle_order:'
+	#sb_tree.display()
 
 if __name__ == '__main__':
 	main()
