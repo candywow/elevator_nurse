@@ -211,7 +211,7 @@ def paint(array_point):
 
 	#print array_point
 	sorted_point = sorted(array_point, key=attrgetter('x'))
-	print sorted_point
+	#print sorted_point
 
 	for item in sorted_point:
 		time_tmp = datetime.datetime.\
@@ -228,17 +228,30 @@ def paint_vd(max_vd_list):
 	data = {'time':time, 'z':z}
 	function.paint(data)
 
+def sample(data, rate):
+	result = []
+	number = len(data) / rate
+	i = 0
+	while len(result) != number:
+		result.append(data[i*rate])
+		i += 1
+	return result
+
+
 def main():
-	z = function.get_z('data3')
+	z = function.get_z('acc_data3.txt')
 	data = restruct(z)
-	print data
 	paint(data)
+	data = sample(data, 10)
+	paint(data)
+	#print data
+	'''paint(data)
 	tmp_list = pip_identification(data)
 	pip_list = tmp_list['pip_list']
 	max_vd_list = tmp_list['max_vd_list']
 	#paint_vd(max_vd_list)
 	length = tree_pruning(max_vd_list)
-	print length
+	#print length
 	#paint_change_vd(change_vd)
 	#print pip_list
 	#print max_vd_list
@@ -252,7 +265,7 @@ def main():
 		tmp.append(item.point)
 	paint(tmp)
 	#print 'middle_order:'
-	#sb_tree.display()
+	#sb_tree.display()'''
 
 if __name__ == '__main__':
 	main()
