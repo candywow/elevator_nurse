@@ -7,7 +7,6 @@ def get_z(file_name):
 	try:
 		z = []
 		time = []
-		f1 = open('test.txt', 'w')
 		with open(file_name) as f:
 			for line in f.readlines()[4500:4520]:
 				f1.write(line)
@@ -16,7 +15,7 @@ def get_z(file_name):
 				data = data[1].split('}')
 				time_tmp = data[1].split('"timestamp":')
 
-				tmp = int(time_tmp[1])/1000.0
+				tmp = float(time_tmp[1])/1000.0
 				'''print tmp
 				time_tmp = datetime.datetime.\
 						fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -31,8 +30,7 @@ def get_z(file_name):
 				#except:
 				#	pass
 		data = {'time':time, 'z':z}
-		#print data
-		f1.close()
+		print data
 		return data
 	except IOError as err:
 		print("File error:" + str(err))
@@ -41,22 +39,27 @@ def get_z_new(file_name):
 	z = []
 	time = []
 	with open(file_name) as f:
-		for line in f.readlines()[0:2]:
+		for line in f.readlines():
 			try:
 				data = line.split(',')
-				z_per = data[2].split(' ')[1].split(']')[0]
+				#print data
+				z_per = data[1].split(':')[1].split('}')[0]
+
 				time_tmp = data[3].split('\n')[0]
-				print time_tmp
+				tmp = float(time_tmp)
 				time_per = datetime.datetime.\
-					fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S')
+						fromtimestamp(tmp).strftime('%Y-%m-%d %H:%M:%S.%f')
+				#print time_per
 
 				z.append(z_per)
 				time.append(time_per)
 			except:
 				pass
 
-	print z
-	print time
+	data = {'time':time, 'z':z}
+	#print data
+	return data
+
 def get_start_num():
 	tmp = -1
 	num = 0
@@ -97,6 +100,6 @@ def paint(data):
 	py.plot(data)
 
 if __name__ == '__main__':
-	get_z('data3')
-	#paint()
+	data = get_z_new('acc_data.txt')
+	paint(data)
 	#get_start_num()
