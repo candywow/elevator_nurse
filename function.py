@@ -8,7 +8,7 @@ def get_z(file_name):
 		z = []
 		time = []
 		with open(file_name) as f:
-			for line in f.readlines()[140000:]:
+			for line in f.readlines()[140000:160000]:
 				data = line.split(',')
 				#print data
 				data_z = data[2].split(':')[1]
@@ -99,17 +99,27 @@ def get_start_num():
 
 
 
-def paint(data):
-	data = {'x': data['time'], 'y': data['z']}
+def paint(data1, data2=0):
+	data1 = {'x': data1['time'], 'y': data1['z']}
 
 	trace1 = Scatter(
-		data,
+		data1,
 		mode='lines',
 		marker=Marker(
 			color='blue',
 			symbol='square'))
 
 	data = Data([trace1])
+	if data2 != 0:
+		data2 = {'x': data2['time'], 'y': data2['z']}
+		trace2 = Scatter(
+			data2,
+			mode='lines',
+			marker=Marker(
+				color='green',
+				symbol='square'))
+
+		data = Data([trace1, trace2])
 	py.plot(data)
 
 if __name__ == '__main__':

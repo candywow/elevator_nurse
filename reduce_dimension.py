@@ -1,7 +1,11 @@
 import function
-import time
+import plotly.plotly as py
 import datetime
+import time
+from plotly.graph_objs import *
 import math
+import pywt
+import matplotlib.pyplot as plt
 from operator import attrgetter
 
 class Point(object):
@@ -126,7 +130,9 @@ def calculate_vd(point1, point2, point3):
 	#print vd
 	return vd
 
-def pip_identification(array_point):
+def pip_identification(array_point, rate):
+	num = len(array_point) / rate
+
 	pip_list = []
 	max_vd_list = []
 
@@ -135,7 +141,8 @@ def pip_identification(array_point):
 	max_vd_list.append(0)
 	max_vd_list.append(0)
 
-	for k in range(len(array_point) - 2):
+	for k in range(num):
+		print k
 		vd = []
 		#print 'k %d' % k
 
@@ -196,6 +203,8 @@ def tree_pruning(max_vd_list):
 
 	return max['index'] + 1
 
+
+
 def paint_change_vd(change_vd):
 	time = range(2, len(change_vd)+2)
 	tmp_vd = []
@@ -209,14 +218,12 @@ def paint(array_point):
 	time = []
 	z = []
 
-	#print array_point
 	sorted_point = sorted(array_point, key=attrgetter('x'))
-	#print sorted_point
 
 	for item in sorted_point:
-		time_tmp = datetime.datetime.\
-						fromtimestamp(item.x).strftime('%Y-%m-%d %H:%M:%S:%f')
-		time.append(time_tmp)
+		#time_tmp = datetime.datetime.\
+		#				fromtimestamp(item.x).strftime('%Y-%m-%d %H:%M:%S:%f')
+		time.append(item.x)
 		z.append(item.y)
 
 	data = {'time':time, 'z':z}
@@ -237,18 +244,52 @@ def sample(data, rate):
 		i += 1
 	return result
 
+def wavedec(data, wavelet, level=None, mode='sym'):
+	coeffs_list = []
+
+	a = data
+	for i in range(level):
+		a, d = pywt.dwt(a, wavelet, mode)
+		coeffs_list.append(d)
+
+	coeffs_list.append(a)
+	coeffs_list.reverse()
+
+	return coeffs_list
+
+def waverec(coeffs_list, wavelet, mode='sym'):
+	a, ds = coeffs_list[0], coeffs_list[1:]
+
+	for d in ds:
+		a = pywt.idwt(a, None, wavelet, mode)
+
+	return a
+
+def dwt(data, level=1):
+	coeffs_list = wavedec(data['z'], 'db2', level)
+	y = waverec(coeffs_list, 'db2')
+	x = range(len(y))
+
+	result = {'z': y, 'time':x}
+	#function.paint(result)
+	return result
+	
 
 def main():
 	z = function.get_z('acc_data3.txt')
-	data = restruct(z)
-	paint(data)
-	data = sample(data, 10)
-	paint(data)
-	#print data
-	'''paint(data)
-	tmp_list = pip_identification(data)
+	data = dwt(z, 8)
+	data = restruct(data)
+	#paint(data)
+	
+	tmp_list = pip_identification(data, 100)
 	pip_list = tmp_list['pip_list']
-	max_vd_list = tmp_list['max_vd_list']
+	#print pip_list
+	result = []
+	for i in pip_list:
+		result.append(data[i])
+	#print result
+	paint(result)
+	'''max_vd_list = tmp_list['max_vd_list']
 	#paint_vd(max_vd_list)
 	length = tree_pruning(max_vd_list)
 	#print length
@@ -263,7 +304,7 @@ def main():
 
 	for item in result:
 		tmp.append(item.point)
-	paint(tmp)
+	paint(tmp)'''
 	#print 'middle_order:'
 	#sb_tree.display()'''
 
