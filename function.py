@@ -1,7 +1,10 @@
 import plotly.plotly as py
 import datetime
 import time
+import math
 from plotly.graph_objs import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 def get_z(file_name):
 	try:
@@ -11,7 +14,7 @@ def get_z(file_name):
 			for line in f.readlines()[140000:160000]:
 				data = line.split(',')
 				#print data
-				data_z = data[2].split(':')[1]
+				data_z = data[1].split(':')[1]
 				data_z = data_z.split('}')[0]
 				#print data_z
 				data_time = data[3].split('\n')[0]
@@ -122,7 +125,34 @@ def paint(data1, data2=0):
 		data = Data([trace1, trace2])
 	py.plot(data)
 
+def paint_mat(data):
+	plt.figure(figsize=(8,8))
+	plt.plot(data['time'], data['z'])
+	plt.show()
+
+
+def fft(data):
+	result = []
+	xf = np.fft.fft(data)
+	for item in xf:
+		#print item
+		amp = math.sqrt(item.real ** 2 + item.imag ** 2)
+		result.append(amp)
+		#print amp
+	return result
+
+
 if __name__ == '__main__':
 	data = get_z('acc_data3.txt')
-	#paint(data)
+	dataf = fft(data['z'])
+	time = []
+	for i in range(len(dataf)):
+		time.append(i)
+	z = {'time': time, 'z': data['z']}
+	zz = {'time': time, 'z': dataf}
+
+	#print max(dataf)
+	#plt.plot(dataf)
+	#plt.show()
+	paint(zz)
 	#get_start_num()

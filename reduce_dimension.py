@@ -243,41 +243,11 @@ def sample(data, rate):
 		result.append(data[i*rate])
 		i += 1
 	return result
-
-def wavedec(data, wavelet, level=None, mode='sym'):
-	coeffs_list = []
-
-	a = data
-	for i in range(level):
-		a, d = pywt.dwt(a, wavelet, mode)
-		coeffs_list.append(d)
-
-	coeffs_list.append(a)
-	coeffs_list.reverse()
-
-	return coeffs_list
-
-def waverec(coeffs_list, wavelet, mode='sym'):
-	a, ds = coeffs_list[0], coeffs_list[1:]
-
-	for d in ds:
-		a = pywt.idwt(a, None, wavelet, mode)
-
-	return a
-
-def dwt(data, level=1):
-	coeffs_list = wavedec(data['z'], 'db2', level)
-	y = waverec(coeffs_list, 'db2')
-	x = range(len(y))
-
-	result = {'z': y, 'time':x}
-	#function.paint(result)
-	return result
 	
 
-def main():
-	z = function.get_z('acc_data3.txt')
-	data = dwt(z, 8)
+def main(data):
+	'''z = function.get_z('acc_data3.txt')
+	data = dwt(z, 8)'''
 	data = restruct(data)
 	#paint(data)
 	
