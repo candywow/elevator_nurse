@@ -144,6 +144,8 @@ def fft(data):
         # print amp
     return result
 
+def mean(data):
+    return float(sum(data))/len(data)
 
 def get_data():
     result = {}
@@ -166,7 +168,10 @@ def get_data():
     paint_mat(result)
 
 if __name__ == '__main__':
-    # get_data()
+    data = get_z('acc_data.txt')
+    print mean(data['z'][:10])
+
+    '''# get_data()
     data = get_z('acc_data.txt')
     #print data
     dataf = fft(data['z'])
@@ -180,4 +185,4 @@ if __name__ == '__main__':
     # plt.plot(dataf)
     # plt.show()
     paint(zz)
-    # get_start_num()
+    # get_start_num()'''
